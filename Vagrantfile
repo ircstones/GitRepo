@@ -96,8 +96,8 @@ Vagrant.configure(2) do |config|
     end
   end
 
-config.vm.define "cstest" do |cstest|
-   cstest.vm.box = "precise64"
+  config.vm.define "cstest" do |cstest|
+    cstest.vm.box = "precise64"
     cstest.vm.hostname = 'cstest'
     cstest.vm.box_url = "ubuntu/precise64"
 
@@ -108,6 +108,21 @@ config.vm.define "cstest" do |cstest|
       v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--name", "cstest"]
+    end
+  end
+
+  config.vm.define "vgtst" do |vgtst|
+    vgtst.vm.box = "precise64"
+    vgtst.vm.hostname = 'vgtst'
+    vgtst.vm.box_url = "https://github.com/tommy-muehle/puppet-vagrant-boxes/releases/download/1.1.0/centos-7.0-x86_64.box"
+
+    vgtst.vm.network :private_network, ip: "192.168.56.103"
+    config.vm.network "public_network"
+
+    vgtst.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 1024]
+      v.customize ["modifyvm", :id, "--name", "vgtst"]
     end
   end
 
