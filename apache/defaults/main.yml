@@ -1,0 +1,8 @@
+---
+# defaults file for roles/apache
+
+apache_manage: false
+apache_autostart: true
+apache_mpm_mode: prefork
+apache_addon_devel: false
+apache_addon_php: false

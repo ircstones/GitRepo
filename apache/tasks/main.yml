@@ -1,0 +1,134 @@
+---
+# tasks file for roles/apache
+  - name: /etc/httpd/conf.d existence
+    register: confd_st
+    stat: path=/etc/httpd/conf.d
+
+  - name: ssl.conf existence
+    register: ssl_conf_st
+    stat: path=/etc/httpd/conf.d/ssl.conf
+
+  - name: install apache
+    when: ansible_os_family == "RedHat" and apache_manage
+    yum: >
+      pkg={{ item }}
+      state=installed
+    tags:
+      - software
+    with_items:
+      - httpd.x86_64
+      - mod_ssl.x86_64
+
+  - name: install RHEL6 Components
+    when: ansible_os_family == "RedHat" and apache_manage and ansible_distribution_major_version == "6"
+    yum: >
+      pkg="mod_proxy_html.x86_64"
+      state=installed
+    tags:
+      - software
+
+  - name: install php
+    when: ansible_os_family == "RedHat" and apache_manage and apache_addon_php
+    yum: >
+      pkg="php.x86_64"
+      state=installed
+    tags:
+      - software
+
+  - name: install devel
+    when: ansible_os_family == "RedHat" and apache_manage and apache_addon_devel
+    yum: >
+      pkg={{ item }}
+      state=installed
+    tags:
+      - software
+    with_items:
+      - "httpd-devel.x86_64"
+      - "gcc.x86_64"
+
+  - name: edit ssl.conf
+    when: not ssl_conf_st.stat.exists and confd_st.stat.exists
+    template:
+      src: templates/ssl.conf.j2
+      dest: /etc/httpd/conf.d/ssl.conf
+      owner: root
+      group: root
+      mode: 0755
+      seuser: system_u
+      setype: httpd_config_t
+      serole: object_r
+      selevel: s0
+
+  - name: sysconfig
+    when: ansible_os_family == "RedHat" and apache_manage
+    template: >
+      src=sysconfig_httpd.j2
+      dest=/etc/sysconfig/httpd
+      owner=root
+      group=root
+      mode=0664
+      seuser=system_u
+      serole=object_r
+      setype=etc_t
+      selevel=s0
+      backup=yes
+
+  - name: disable httpd posttrans
+    when: ansible_os_family == "RedHat" and apache_manage
+    tags: httpd_postinst
+    file: >
+      dest=/etc/sysconfig/httpd-disable-posttrans
+      owner=root
+      group=root
+      mode=0664
+      state=touch
+    changed_when: false
+
+  - name: Change ownership of /usr/sbin/apachectl
+    when: ansible_os_family == "RedHat" and apache_manage
+    file: >
+      state=file
+      owner={{ apache_user }}
+      group={{ apache_user }}
+      path=/usr/sbin/apachectl
+
+  - name: Change ownership of /etc/httpd
+    when: ansible_os_family == "RedHat" and apache_manage
+    file: >
+      state=directory
+      owner={{ apache_user }}
+      group={{ apache_user }}
+      path=/etc/httpd
+      recurse=yes
+      
+  - name: Change ownership of /var/run/httpd
+    when: ansible_os_family == "RedHat" and apache_manage
+    file: >
+      state=directory
+      owner={{ apache_user }}
+      group={{ apache_user }}
+      path=/var/run/httpd
+      recurse=yes
+
+  - name: Change ownership of /var/log/httpd
+    when: ansible_os_family == "RedHat" and apache_manage
+    file: >
+      state=directory
+      owner={{ apache_user }}
+      group={{ apache_user }}
+      path=/var/log/httpd
+      recurse=yes
+
+  - name: Disable init.d script
+    when: ansible_os_family == "RedHat" and apache_manage
+    service: name=httpd enabled=no
+
+  - name: Start on boot
+    when: ansible_os_family == "RedHat" and apache_manage
+    lineinfile:
+      dest: '/etc/rc.local'
+      regexp: '.*apachectl.*'
+      line: "/bin/su -l {{ apache_user }} --command='/usr/sbin/apachectl start'"
+      state: "{% if apache_autostart %}present{% else %}absent{% endif %}
+
+
