@@ -1,0 +1,6 @@
+---
+# handlers file for roles/syslog-server
+  - name: restart rsyslog
+    service: name=rsyslog enabled=yes state=restarted
+
+# viminfo:ft=ansible:

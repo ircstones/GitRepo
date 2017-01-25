@@ -1,0 +1,29 @@
+---
+# tasks file for roles/syslog_server
+
+  - name: install packages
+    yum: >
+      pkg={{ item }}
+      state=installed
+    with_items:
+      - rsyslog
+    when:
+      - syslog_server_manage
+
+  - name: rsyslog.conf
+    notify: restart rsyslog
+    template: >
+      src=rsyslog.j2
+      dest=/etc/rsyslog.conf
+      owner=root
+      group=root
+      mode=0644
+      backup=yes
+      seuser=system_u
+      serole=object_r
+      setype=syslog_conf_t
+      selevel=s0
+    when:
+      - syslog_server_manage
+
+# viminfo:ft=ansible:
