@@ -1,0 +1,55 @@
+---
+# tasks file for roles/iptables
+  - name: package
+    when: iptables_manage or ip6tables_manage
+    yum: name=iptables
+
+  - name: configuration
+    when: 
+      - iptables_manage
+    notify: restart iptables
+    template: >
+      src=iptables.j2
+      dest=/etc/sysconfig/iptables
+      owner=root
+      group=root
+      mode=0600
+      backup=yes
+      seuser=system_u
+      serole=object_r
+      setype="{{ 'system_conf_t' if ansible_distribution_major_version in ['6','7'] else 'iptables_conf_t' }}"
+      selevel=s0
+
+  - name: configuration
+    when: 
+      - ip6tables_manage
+    notify: restart ip6tables
+    template: >
+      src=ip6tables.j2
+      dest=/etc/sysconfig/ip6tables
+      owner=root
+      group=root
+      mode=0600
+      backup=yes
+      seuser=system_u
+      serole=object_r
+      setype="{{ 'system_conf_t' if ansible_distribution_major_version in ['6','7'] else 'iptables_conf_t' }}"
+      selevel=s0
+
+  - name: service
+    when:
+      - iptables_manage
+    service: >
+      name=iptables
+      enabled=yes
+      state=started
+
+  - name: service
+    when:
+      - ip6tables_manage
+    service: >
+      name=ip6tables
+      enabled=yes
+      state=started
+
+# viminfo:ft=ansible:

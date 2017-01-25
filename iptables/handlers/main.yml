@@ -1,0 +1,10 @@
+---
+# handlers file for roles/iptables
+  - name: restart iptables
+    service: name=iptables state=restarted
+
+# handlers file for roles/iptables
+  - name: restart ip6tables
+    service: name=ip6tables state=restarted
+
+# viminfo:ft=ansible:

@@ -1,0 +1,48 @@
+---
+# defaults file for roles/iptables
+
+iptables_chain_INPUT: 'ACCEPT'
+iptables_chain_FORWARD: 'ACCEPT'
+iptables_chain_OUTPUT: 'ACCEPT'
+
+# This is a placeholder. If you need to declare ports for a server, do so under group_vars
+iptables_INPUT: []
+
+iptables_INPUT_footer:
+  - { 'dport': '1556', 'proto': 'tcp', 'match': 'tcp', 'response': 'ACCEPT' }
+  - { 'state': 'RELATED,ESTABLISHED', 'response': 'ACCEPT' }
+  - { 'proto': 'icmp', 'response': 'ACCEPT' }
+  - { 'interface': 'lo', 'response': 'ACCEPT' }
+  - { 'dport': '22', 'proto': 'tcp', 'match': 'tcp', 'state': 'NEW', 'response': 'ACCEPT' }
+  - { 'rejectwith': 'icmp-host-prohibited', 'response': 'REJECT' }
+
+iptables_FORWARD:
+  - { 'rejectwith': 'icmp-host-prohibited', 'response': 'REJECT' }
+
+iptables_OUTPUT: []
+
+iptables_manage: false
+
+ip6tables_chain_INPUT: 'ACCEPT'
+ip6tables_chain_FORWARD: 'ACCEPT'
+ip6tables_chain_OUTPUT: 'ACCEPT'
+
+# This is a placeholder. If you need to declare ports for a server, do so under group_vars
+ip6tables_INPUT: []
+
+ip6tables_INPUT_footer:
+  - { 'dport': '1556', 'proto': 'tcp', 'match': 'tcp', 'response': 'ACCEPT' }
+  - { 'state': 'RELATED,ESTABLISHED', 'response': 'ACCEPT' }
+  - { 'proto': 'ipv6-icmp', 'response': 'ACCEPT' }
+  - { 'interface': 'lo', 'response': 'ACCEPT' }
+  - { 'dport': '22', 'proto': 'tcp', 'match': 'tcp', 'state': 'NEW', 'response': 'ACCEPT' }
+  - { 'rejectwith': 'icmp6-adm-prohibited', 'response': 'REJECT' }
+
+ip6tables_FORWARD:
+  - { 'rejectwith': 'icmp6-adm-prohibited', 'response': 'REJECT' }
+
+ip6tables_OUTPUT: []
+
+ip6tables_manage: false
+
+# viminfo:ft=ansible:
