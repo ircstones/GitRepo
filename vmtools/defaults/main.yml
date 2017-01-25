@@ -1,0 +1,9 @@
+---
+# defaults file for netbackup_client
+
+vmware_tools_installer: /opt/repo/ansible-files/vmware-tools.tgz
+vmware_tools_inst_dir: /tmp
+
+vmtools_force_reconfigure: false
+
+# vim:ft=ansible:

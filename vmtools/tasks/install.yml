@@ -1,0 +1,39 @@
+---
+# tasks file for vmtools install
+
+ # If the path isn't there.
+  - name: check if /user/lib/vmware-tools exists
+    tags: test
+    when: ansible_virtualization_type == 'VMware' and ansible_os_family == "RedHat" and ansible_distribution_version =="6.6"
+    stat: path=/usr/lib/vmware-tools
+    register: vmwaretools_path
+
+  - name: check if /usr/sbin/vmtoolsd exists
+    tags: test
+    when: ansible_virtualization_type == 'VMware' and ansible_os_family == "RedHat" and ansible_distribution_version =="6.6"
+    stat: path=/usr/sbin/vmtoolsd
+    register: vmwaredaemon_path
+
+  - name: Missing Vmware Tools 
+    tags: test
+    when: vmwaretools_path.stat.exists == false and vmwaredaemon_path.stat.exists == false 
+    file: >
+      state=directory
+      path=/tmp/vmtools
+      owner=root
+      group=root
+      mode=0700
+
+  - name: extract installer
+    register: vmware_tools_extract_result
+    when: vmwaretools_path.stat.exists == false and vmwaredaemon_path.stat.exists == false
+    unarchive: >
+      src="{{ vmware_tools_installer }}"
+      dest="{{ vmware_tools_inst_dir }}"
+      creates="{{ vmware_tools_inst_dir }}"
+      copy=yes
+      owner=root
+      group=root
+
+
+# vim:ft=ansible:

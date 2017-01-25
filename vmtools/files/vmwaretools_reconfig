@@ -1,0 +1,12 @@
+#!/usr/bin/expect
+set timeout -1
+spawn /usr/bin/vmware-config-tools.pl
+expect "to enable this feature?"
+send "no\n"
+expect "Fusion or Workstation virtual environment.  Do you wish to enable this feature?"
+send "no\n"
+expect "Would you like to enable VMware automatic kernel modules?"
+send "yes\n"
+expect eof
+
+# vim:ft=ansible:

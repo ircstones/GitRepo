@@ -1,0 +1,27 @@
+---
+# tasks file for vmtools install
+
+ # If the path isn't there.
+  - name: check if /user/lib/vmware-tools exists
+    tags: test
+    when: ansible_virtualization_type == 'VMware' and ansible_os_family == "RedHat" and ansible_distribution_version =="6.6"
+    stat: path=/usr/lib/vmware-tools
+    register: vmwaretools_path
+
+  - name: check if /usr/sbin/vmtoolsd exists
+    tags: test
+    when: ansible_virtualization_type == 'VMware' and ansible_os_family == "RedHat" and ansible_distribution_version =="6.6"
+    stat: path=/usr/sbin/vmtoolsd
+    register: vmwaredaemon_path
+
+    #- name: Missing Vmware Tools 
+    #  tags: test
+    #  when: vmwaretools_path.stat.exists == false and vmwaredaemon_path.stat.exists == false  
+    #  include: install.yml
+      
+  - name: Reconfigure Vmware Tools
+    tags: test
+    when: vmtools_force_reconfigure and ansible_virtualization_type == 'VMware' and ansible_os_family == "RedHat" and ansible_distribution_version =="6.6" 
+    include: reconfig.yml
+
+# vim:ft=ansible:

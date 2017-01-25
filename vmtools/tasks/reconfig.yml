@@ -1,0 +1,24 @@
+---
+# tasks file for vmtools install
+
+
+  - name: install expect
+    yum: name=expect state=present
+
+  - name: expect script install
+    copy: >
+      src=vmwaretools_reconfig
+      dest=/opt/vmwaretools_reconfig
+      owner=root
+      group=root
+      mode=0700
+
+  - name: expect reconfig vmtools
+    command: /opt/vmwaretools_reconfig
+
+  - name: expect clean up script
+    file: >
+      path=/opt/vmwaretools_reconfig
+      state=absent
+
+# vim:ft=ansible:
