@@ -1,0 +1,171 @@
+---
+# tasks file for roles/elasticsearch
+
+  - name: elasticsearch check subscription
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+    register: elasticsearch_subscription_status
+    command: >
+      subscription-manager list --consumed
+    failed_when: "elasticsearch_subscription_status.rc > 0"
+    changed_when: "elasticsearch_subscription_status.rc != 0"
+
+  - name: elasticsearch subscription
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node 
+      - "'{{ satellite_elasticsearch_pool_id }}' not in elasticsearch_subscription_status.stdout"
+    command: subscription-manager attach --pool={{ satellite_elasticsearch_pool_id }}
+
+  - name: package
+    notify: restart elasticsearch
+    yum: >
+      name=elasticsearch-{{ elasticsearch_version }}
+      disable_gpg_check=yes
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: elasticsearch sysconfig
+    notify: restart elasticsearch
+    template: >
+      src=sysconfig-elasticsearch.j2
+      dest=/etc/sysconfig/elasticsearch
+      owner=root
+      group=root
+      mode=0644
+      backup=yes
+      seuser=system_u
+      serole=object_r
+      setype=etc_t
+      selevel=s0
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: sysctl.conf
+    notify: remount swap
+    sysctl: >
+      name="vm.swappiness"
+      value=0
+      ignoreerrors=yes
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: elasticsearch.yml
+    notify: restart elasticsearch
+    template: >
+      src=elasticsearch-elasticsearch.j2
+      dest={{ elasticsearch_config_dir }}/elasticsearch.yml
+      owner=root
+      group=root
+      mode=0644
+      backup=yes
+      seuser=system_u
+      serole=object_r
+      setype=etc_t
+      selevel=s0
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: logging.yml
+    notify: restart elasticsearch
+    copy: >
+      src=logging.yml
+      dest={{ elasticsearch_config_dir }}/logging.yml
+      owner=root
+      group=root
+      mode=0644
+      backup=yes
+      seuser=system_u
+      serole=object_r
+      setype=etc_t
+      selevel=s0
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: data dir
+    notify: restart elasticsearch
+    file: >
+      path={{ elasticsearch_data_dir }}/data
+      state=directory
+      owner=elasticsearch
+      group=elasticsearch
+      mode=0700
+      seuser=unconfined_u
+      serole=object_r
+      setype=file_t
+      selevel=s0
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: logs dir
+    notify: restart elasticsearch
+    file: >
+      path={{ elasticsearch_data_dir }}/logs
+      state=directory
+      owner=elasticsearch
+      group=elasticsearch
+      mode=0700
+      seuser=unconfined_u
+      serole=object_r
+      setype=file_t
+      selevel=s0
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: temp dir
+    notify: restart elasticsearch
+    file: >
+      path={{ elasticsearch_data_dir }}/temp
+      state=directory
+      owner=elasticsearch
+      group=elasticsearch
+      mode=0700
+      seuser=unconfined_u
+      serole=object_r
+      setype=file_t
+      selevel=s0
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: java tmp dir
+    notify: restart elasticsearch
+    file: >
+      path={{ elasticsearch_data_dir }}/tmp
+      state=directory
+      owner=root
+      group=root
+      mode=0777
+      seuser=system_u
+      serole=object_r
+      setype=tmp_t
+      selevel=s0
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+  - name: plugins dir
+    notify: restart elasticsearch
+    file: >
+      path={{ elasticsearch_data_dir }}/plugins
+      state=directory
+      owner=elasticsearch
+      group=elasticsearch
+      mode=0700
+      seuser=unconfined_u
+      serole=object_r
+      setype=file_t
+      selevel=s0
+    when:
+      - elasticsearch_manage
+      - elasticsearch_data_node or elasticsearch_master_node
+
+# viminfo:ft=ansible:

@@ -1,0 +1,20 @@
+---
+# defaults file for roles/elasticsearch_data
+
+satellite_elasticsearch_pool_id: 2d7b40134a74d510014ada9a019f02bb
+
+elasticsearch_config_dir: /etc/elasticsearch
+elasticsearch_data_dir: /opt/elasticsearch
+elasticsearch_data_node: true
+elasticsearch_master_node: false
+
+elasticsearch_low_watermark: 60gb 
+elasticsearch_high_watermark: 40gb 
+es_heap_size: 8g
+
+indices.store.throttle.max_bytes_per_sec: 100mb
+index.refresh_interval: 30s
+
+elasticsearch_manage: false
+
+# viminfo:ft=ansible:

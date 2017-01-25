@@ -1,0 +1,40 @@
+## Config attributes
+cluster.name: {{ es_cluster_name }} 
+http.cors.enabled: true
+node.name: "es-spe-{{ inventory_hostname|replace("usdl", "",) }}"
+node.data:{% if elasticsearch_data_node %} true {% else %} false {% endif %} 
+node.master:{% if elasticsearch_master_node %} true {% else %} false {% endif %} 
+index.number_of_shards: 5
+index.number_of_replicas: 1
+path.conf: {{ elasticsearch_config_dir }}
+path.data: {{ elasticsearch_data_dir }}/data
+path.work: {{ elasticsearch_data_dir }}/temp
+path.logs: {{ elasticsearch_data_dir }}/logs
+path.plugins: {{ elasticsearch_data_dir }}/plugins
+transport.tcp.port: 9300
+transport.tcp.compress: true
+http.port: 9200
+http.max_content_length: 100mb
+http.enabled:{% if elasticsearch_master_node %} true {% else %} false {% endif %} 
+gateway.recover_after_nodes: 6 
+gateway.recover_after_time: 2m
+indices.recovery.max_bytes_per_sec: 100mb
+indices.store.throttle.max_bytes_per_sec: 100mb
+index.cache.field.expire: 5m
+discovery.zen.minimum_master_nodes: 1
+discovery.zen.ping.timeout: 4s
+discovery.zen.ping.multicast.enabled: false
+discovery.zen.ping.unicast.hosts: {{ elasticsearch_autodiscovery_hosts|join(',') }}
+action.disable_delete_all_indices: true
+index.refresh_interval: 30s 
+index.cache.field.type: soft
+indices.memory.index_buffer_size: 20%
+## Prevent JVM from swapping
+bootstrap.mlockall: true
+## Change cluster watermarks
+cluster.routing.allocation.disk.watermark.low: {{ elasticsearch_low_watermark }}
+cluster.routing.allocation.disk.watermark.high: {{ elasticsearch_high_watermark }}
+## Generic attributes
+node.rack: nonvblock
+
+# vim:ft=ansible:
