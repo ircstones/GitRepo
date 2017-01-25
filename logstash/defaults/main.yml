@@ -1,0 +1,8 @@
+---
+# defaults file for roles/logstash_data
+
+satellite_logstash_pool_id: 2d7b40134a74d510014ada9a019f02bb
+
+logstash_manage: false
+
+# viminfo:ft=ansible:

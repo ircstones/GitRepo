@@ -1,0 +1,6 @@
+---
+# handlers file for roles/logstash
+  - name: restart logstash
+    service: name=logstash enabled=yes state=restarted
+
+# viminfo:ft=ansible:

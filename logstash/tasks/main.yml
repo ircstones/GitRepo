@@ -1,0 +1,23 @@
+---
+# tasks file for roles/logstash
+
+  - name: logstash check subscription
+    when:
+      - logstash_manage
+    register: logstash_subscription_status
+    command: >
+      subscription-manager list --consumed
+    failed_when: "logstash_subscription_status.rc > 0"
+    changed_when: "logstash_subscription_status.rc != 0"
+
+  - name: logstash subscription
+    when:
+      - logstash_manage
+      - "'{{ satellite_logstash_pool_id }}' not in logstash_subscription_status.stdout"
+    command: subscription-manager attach --pool={{ satellite_logstash_pool_id }}
+
+  - include: files.yml
+    when:
+      - logstash_manage
+
+# viminfo:ft=ansible:
