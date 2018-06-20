@@ -30,16 +30,3 @@ Since the existing logstash playbook simply calls this role on a set of hosts, y
     - hosts: some hosts
       roles:
         - logstash
-
-
-# Requirements
-
-Sudo access on remote host.
-
-# License
-
-Sony Pictures Entertainment. All rights reserved
-
-# Author Information
-
-Jason Ritzke
