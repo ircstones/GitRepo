@@ -46,13 +46,3 @@ Implement it in your playbook as below:
 # Requirements
 
 Sudo access on remote host.
-
-# License
-
-Sony Pictures Entertainment. All rights reserved
-
-# Author Information
-
-Jason Ritzke
-
-Tyler Johnson
